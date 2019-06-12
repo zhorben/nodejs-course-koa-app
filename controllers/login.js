@@ -1,6 +1,4 @@
-const passport = require('../lib/passport');
-const Session = require('../models/Session');
-const uuid = require('uuid/v4');
+const passport = require('../libs/passport');
 
 module.exports = async function login(ctx, next) {
   await passport.authenticate('local', async (err, user, info) => {
@@ -8,13 +6,12 @@ module.exports = async function login(ctx, next) {
     
     if (!user) {
       ctx.status = 400;
-      ctx.body = { error: info };
+      ctx.body = {error: info};
       return;
     }
     
-    const token = uuid();
-    await Session.create({ token, user });
+    const token = await ctx.login(user);
     
-    ctx.body = { token };
+    ctx.body = {token};
   })(ctx, next);
 };

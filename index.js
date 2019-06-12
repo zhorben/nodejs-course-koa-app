@@ -1,9 +1,8 @@
-const config = require('config');
 const app = require('./app');
-const socket = require('./lib/socket');
+const socket = require('./socket');
 
-const server = app.listen(config.get('port'), () => {
-  console.log(`server is running on http://localhost:${config.get('port')}`);
+const server = app.listen(3000, () => {
+  console.log('App is running on http://localhost:3000');
 });
 
 socket(server);

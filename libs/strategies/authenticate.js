@@ -1,10 +1,10 @@
 const User = require('../../models/User');
 
-module.exports = async function authenticate(strategy, email, profile, done) {
+module.exports = async function authenticate(strategy, email, displayName, done) {
   if (!email) {
     return done(null, false, 'Не указан email');
   }
-  
+
   try {
     let user = await User.findOne({email});
 
@@ -13,12 +13,11 @@ module.exports = async function authenticate(strategy, email, profile, done) {
     }
 
     user = await User.create({
-      email,
-      name: profile.displayName,
+      email, displayName,
     });
     done(null, user);
   } catch (err) {
-    console.error(err);
     done(err);
   }
 };
+

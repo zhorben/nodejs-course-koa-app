@@ -1,4 +1,5 @@
-const mongoose = require('../lib/mongoose');
+const mongoose = require('mongoose');
+const connection = require('../libs/connection');
 
 const messageSchema = new mongoose.Schema({
   user: {
@@ -6,7 +7,7 @@ const messageSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-
+  
   text: {
     type: String,
     required: true,
@@ -19,4 +20,4 @@ const messageSchema = new mongoose.Schema({
   
 });
 
-module.exports = mongoose.model('Message', messageSchema);
+module.exports = connection.model('Message', messageSchema);

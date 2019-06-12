@@ -1,4 +1,5 @@
-const mongoose = require('../lib/mongoose');
+const mongoose = require('mongoose');
+const connection = require('../libs/connection');
 
 const schema = new mongoose.Schema({
   token: {
@@ -6,14 +7,17 @@ const schema = new mongoose.Schema({
     unique: true,
     required: true,
   },
+  lastVisit: {
+    type: Date,
+    required: true,
+  },
   user: {
     type: mongoose.Types.ObjectId,
-    ref: 'User'
+    required: true,
+    ref: 'User',
   }
-}, {
-  timestamps: true
 });
 
-schema.path('createdAt').index({expires: '7d'});
+schema.path('lastVisit').index({expires: '7d'});
 
-module.exports = mongoose.model('Session', schema);
+module.exports = connection.model('Session', schema);

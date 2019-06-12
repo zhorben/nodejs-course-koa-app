@@ -1,34 +1,16 @@
+const fs = require('fs');
+const path = require('path');
 const Koa = require('koa');
+const uuid = require('uuid/v4');
 const Router = require('koa-router');
-const cors = require('@koa/cors');
-const logger = require('koa-logger');
-const bodyParser = require('koa-bodyparser');
-
+const handleMongooseValidationError = require('./libs/validationErrors');
 const Session = require('./models/Session');
-const mustBeAuthenticated = require('./lib/mustBeAuthenticated');
+const mustBeAuthenticated = require('./libs/mustBeAuthenticated');
 
-const app = module.exports = new Koa();
+const app = new Koa();
 
-const router = new Router({ prefix: '/api' });
-
-router.use(async (ctx, next) => {
-  const token = ctx.query.token;
-  if (!token) return next();
-  
-  const session = await Session.findOne({token}).populate('user');
-  if (!session) return next();
-  
-  ctx.user = session.user;
-  return next();
-});
-
-router.post('/login', require('./controllers/login'));
-router.post('/register', require('./controllers/register'));
-router.post('/confirm', require('./controllers/confirm'));
-router.post('/oauth', require('./controllers/oauth').oauth);
-router.post('/oauth_callback', require('./controllers/oauth').oauth_callback);
-
-router.get('/messages', mustBeAuthenticated, require('./controllers/messages'));
+app.use(require('koa-static')('public'));
+app.use(require('koa-bodyparser')());
 
 app.use(async (ctx, next) => {
   try {
@@ -36,17 +18,64 @@ app.use(async (ctx, next) => {
   } catch (err) {
     if (err.status) {
       ctx.status = err.status;
-      ctx.body = { error: err.error };
-      return;
+      ctx.body = {error: err.message};
+    } else {
+      console.error(err);
+      ctx.status = 500;
+      ctx.body = {error: 'Internal server error'};
     }
-    
-    console.error(err);
-    ctx.status = 500;
-    ctx.body = { error: 'Internal server error' };
   }
 });
 
-app.use(bodyParser());
-app.use(logger());
-app.use(cors());
+app.use((ctx, next) => {
+  ctx.login = async function login(user) {
+    const token = uuid();
+    await Session.create({ token, user, lastVisit: new Date() });
+    
+    return token;
+  };
+  
+  return next();
+});
+
+const router = new Router({prefix: '/api'});
+
+router.use(async (ctx, next) => {
+  const header = ctx.request.get('Authorization');
+  if (!header) return next();
+  
+  const token = header.split(' ')[1];
+  if (!token) return next();
+  
+  const session = await Session.findOne({token}).populate('user');
+  if (!session) {
+    ctx.throw(401, 'Неверный аутентификационный токен');
+  }
+  session.lastVisit = new Date();
+  await session.save();
+  
+  ctx.user = session.user;
+  return next();
+});
+
+router.post('/login', require('./controllers/login'));
+router.get('/oauth/:provider', require('./controllers/oauth').oauth);
+router.post('/oauth_callback', handleMongooseValidationError, require('./controllers/oauth').oauthCallback);
+router.post('/register', handleMongooseValidationError, require('./controllers/register'));
+router.post('/confirm', require('./controllers/confirm'));
+
+router.get('/me', mustBeAuthenticated, require('./controllers/me'));
+router.get('/messages', mustBeAuthenticated, require('./controllers/messages'));
+
 app.use(router.routes());
+
+// this for HTML5 history in browser
+const index = fs.readFileSync(path.join(__dirname, 'public/index.html'));
+app.use(async (ctx, next) => {
+  if (!ctx.url.startsWith('/api')) {
+    ctx.set('content-type', 'text/html');
+    ctx.body = index;
+  }
+});
+
+module.exports = app;
