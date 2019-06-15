@@ -58,12 +58,23 @@ router.use(async (ctx, next) => {
   return next();
 });
 
+// auth
 router.post('/login', require('./controllers/login'));
 router.get('/oauth/:provider', require('./controllers/oauth').oauth);
 router.post('/oauth_callback', handleMongooseValidationError, require('./controllers/oauth').oauthCallback);
 router.post('/register', handleMongooseValidationError, require('./controllers/register'));
 router.post('/confirm', require('./controllers/confirm'));
 
+// shop
+router.get('/categories', require('./controllers/categories'));
+router.get('/products', require('./controllers/products'));
+router.get('/recommendations', require('./controllers/recommendations'));
+router.post('/checkout', mustBeAuthenticated, handleMongooseValidationError, require('./controllers/checkout'));
+
+// search
+router.get('/search', require('./controllers/search'));
+
+// protected
 router.get('/me', mustBeAuthenticated, require('./controllers/me'));
 router.get('/messages', mustBeAuthenticated, require('./controllers/messages'));
 
