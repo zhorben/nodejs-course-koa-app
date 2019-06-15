@@ -24,11 +24,11 @@ function socket(server) {
     socket.on('message', async msg => {
       const date = new Date();
       
-      io.emit('user_message', {
-        user: socket.user.displayName,
-        text: msg,
-        date: date
-      });
+      setTimeout(() => {
+        socket.emit('message', {
+          text: 'Добрый день, вас приветствует бот AnyShop.',
+        });
+      }, 700);
       
       await Message.create({
         user: socket.user.id,
