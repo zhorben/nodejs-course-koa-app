@@ -32,7 +32,7 @@ for (const file of files) {
     products[category] = products[category] || {};
     products[category][subcategory] = products[category][subcategory] || 0;
     
-    if (products[category][subcategory] < 10) {
+    if (products[category][subcategory] < 10 && product['Описание']) {
       products[category][subcategory]++;
       
       products.items.push({

@@ -4,6 +4,7 @@ const connection = require('../libs/connection');
 const subCategorySchema = new mongoose.Schema({
   title: {
     type: String,
+    required: true,
   }
 });
 
