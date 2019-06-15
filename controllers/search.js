@@ -1,3 +1,8 @@
+const Product = require('../models/Product');
+
 module.exports = async function search(ctx, next) {
-  ctx.body = {goods: []};
+  const products = await Product.find({
+    $text: {$search: ctx.query.q}
+  });
+  ctx.body = { products };
 };

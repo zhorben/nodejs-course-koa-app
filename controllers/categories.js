@@ -1,3 +1,6 @@
+const Category = require('../models/Category');
+
 module.exports = async function categories(ctx, next) {
-  ctx.body = {categories: []};
+  const categories = await Category.find();
+  ctx.body = { categories };
 };
