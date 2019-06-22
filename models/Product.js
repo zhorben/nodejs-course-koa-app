@@ -28,11 +28,7 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   
-  images: [{
-    url: {
-      type: String,
-    }
-  }],
+  images: [String],
   
 });
 

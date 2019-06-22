@@ -9,7 +9,8 @@ const categories = {/*
 */};
 
 const products = {
-  items: [/* {title, description, category, subcategory, images, price} */],/*
+  items: [/* {title, description, category, subcategory, images, price} */],
+  titles: new Set(),/*
   [category]: {
     [subcategory]: count,
   },
@@ -32,14 +33,19 @@ for (const file of files) {
     products[category] = products[category] || {};
     products[category][subcategory] = products[category][subcategory] || 0;
     
+    const title = product['Имя товара'];
+    
+    if (products.titles.has(title)) continue;
+    
     if (products[category][subcategory] < 10 && product['Описание']) {
       products[category][subcategory]++;
       
+      products.titles.add(title);
       products.items.push({
-        title: product['Имя товара'],
+        title,
         description: product['Описание'],
         category, subcategory,
-        images: product['Ссылки на фото (через пробел)'].split(' ').map(link => link.trim()),
+        images: product['Ссылки на фото (через пробел)'].split(' ').map(link => link.trim()).slice(0, 5),
         price: product['Цена'],
       });
     }

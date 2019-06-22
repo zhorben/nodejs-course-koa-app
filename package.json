@@ -7,6 +7,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@koa/cors": "^2.2.3",
     "chai": "^4.2.0",
     "juice": "^5.2.0",
     "koa": "^2.7.0",
@@ -36,7 +37,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

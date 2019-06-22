@@ -3,12 +3,14 @@ const path = require('path');
 const Koa = require('koa');
 const uuid = require('uuid/v4');
 const Router = require('koa-router');
+const cors = require('@koa/cors');
 const handleMongooseValidationError = require('./libs/validationErrors');
 const Session = require('./models/Session');
 const mustBeAuthenticated = require('./libs/mustBeAuthenticated');
 
 const app = new Koa();
 
+app.use(cors());
 app.use(require('koa-static')('public'));
 app.use(require('koa-bodyparser')());
 
