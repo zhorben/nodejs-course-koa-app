@@ -1,23 +1,8 @@
-"use strict";
-
 const Product = require('../models/Product');
+const compose = require('koa-compose');
 
-module.exports = async function products(ctx, next) {
-  const {category, query} = ctx.query;
-  
-  let products = [];
-  if (category) {
-    products = await Product.find({subcategory: category}).limit(20);
-  } else if (query) {
-    products = await Product
-      .find({$text: { $search: query }}, { score: { $meta: 'textScore' } })
-      .sort({ score: { $meta: 'textScore' } })
-      .limit(20);
-  } else {
-    products = await Product.find().limit(20);
-  }
-  
-  ctx.body = {products: products.map(product => ({
+function mapProducts(products) {
+  return products.map(product => ({
     id: product.id,
     title: product.title,
     images: product.images,
@@ -25,5 +10,35 @@ module.exports = async function products(ctx, next) {
     subcategory: product.subcategory,
     price: product.price,
     description: product.description,
-  }))}
-};
+  }));
+}
+
+async function productsByCategory(ctx, next) {
+  const {category} = ctx.query;
+  if (!category) return next();
+  
+  const products = await Product.find({subcategory: category}).limit(20);
+  ctx.body = {products: mapProducts(products)};
+}
+
+async function productsByQuery(ctx, next) {
+  const {query} = ctx.query;
+  if (!query) return next();
+  
+  const products = await Product
+    .find({$text: { $search: query }}, { score: { $meta: 'textScore' } })
+    .sort({ score: { $meta: 'textScore' } })
+    .limit(20);
+  ctx.body = {products: mapProducts(products)};
+}
+
+async function productsList(ctx, next) {
+  const products = await Product.find().limit(20);
+  ctx.body = {products: mapProducts(products)};
+}
+
+module.exports = compose([
+  productsByCategory,
+  productsByQuery,
+  productsList,
+]);
