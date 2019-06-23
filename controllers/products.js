@@ -32,7 +32,7 @@ async function productsByQuery(ctx, next) {
   ctx.body = {products: mapProducts(products)};
 }
 
-async function productsList(ctx, next) {
+async function productList(ctx, next) {
   const products = await Product.find().limit(20);
   ctx.body = {products: mapProducts(products)};
 }
@@ -40,5 +40,5 @@ async function productsList(ctx, next) {
 module.exports = compose([
   productsByCategory,
   productsByQuery,
-  productsList,
+  productList,
 ]);
