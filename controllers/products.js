@@ -37,7 +37,23 @@ async function productList(ctx, next) {
   ctx.body = {products: mapProducts(products)};
 }
 
-module.exports = compose([
+async function product(ctx, next) {
+  const product = await Product.findById(ctx.params.id);
+
+  ctx.body = {product: {
+    id: product.id,
+    title: product.title,
+    images: product.images,
+    category: product.category,
+    subcategory: product.subcategory,
+    price: product.price,
+    description: product.description,
+  }};
+}
+
+exports.show = product;
+
+exports.list = compose([
   productsByCategory,
   productsByQuery,
   productList,
