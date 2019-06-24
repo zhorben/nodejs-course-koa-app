@@ -71,7 +71,7 @@ router.post('/confirm', require('./controllers/confirm'));
 router.get('/categories', require('./controllers/categories'));
 router.get('/products', require('./controllers/products'));
 router.get('/recommendations', require('./controllers/recommendations'));
-router.post('/checkout', mustBeAuthenticated, handleMongooseValidationError, require('./controllers/checkout'));
+router.post('/orders', mustBeAuthenticated, handleMongooseValidationError, require('./controllers/orders'));
 
 // search
 router.get('/search', require('./controllers/search'));

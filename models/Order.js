@@ -6,8 +6,20 @@ const orderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     required: true,
     ref: 'User',
+  },
+  product: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: 'Product',
+  },
+  phone: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
   }
-  
 });
 
 module.exports = connection.model('Order', orderSchema);
