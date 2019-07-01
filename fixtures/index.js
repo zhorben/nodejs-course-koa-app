@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
+const Order = require('../models/Order');
 const connection = require('../libs/connection');
 const users = require('./users');
 const categories = require('./categories');
@@ -10,13 +11,14 @@ const products = require('./products');
   await User.deleteMany();
   await Category.deleteMany();
   await Product.deleteMany();
+  await Order.deleteMany();
 
   for (const user of users) {
     const u = new User(user);
     await u.setPassword(user.password);
     await u.save();
   }
-  
+
   const categoriesMap = {/*
     [title]: {
       id: ...,
@@ -25,10 +27,10 @@ const products = require('./products');
       }
     }
   */};
-  
+
   for (const category of categories) {
     const c = await Category.create(category);
-    
+
     categoriesMap[category.title] = {
       id: c.id,
       subcategories: c.subcategories.reduce((r, s) => {
@@ -37,7 +39,7 @@ const products = require('./products');
       }, {})
     };
   }
-  
+
   for (const product of products) {
     await Product.create({
       title: product.title,
@@ -48,10 +50,10 @@ const products = require('./products');
       images: product.images,
     });
   }
-  
-  
+
+
   connection.close();
-  
+
   console.log(`${users.length} users have been saved in DB`);
   console.log(`${categories.length} categories have been saved in DB`);
   console.log(`${products.length} products have been saved in DB`);

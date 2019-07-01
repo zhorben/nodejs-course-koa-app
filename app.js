@@ -33,10 +33,10 @@ app.use((ctx, next) => {
   ctx.login = async function login(user) {
     const token = uuid();
     await Session.create({ token, user, lastVisit: new Date() });
-    
+
     return token;
   };
-  
+
   return next();
 });
 
@@ -45,17 +45,17 @@ const router = new Router({prefix: '/api'});
 router.use(async (ctx, next) => {
   const header = ctx.request.get('Authorization');
   if (!header) return next();
-  
+
   const token = header.split(' ')[1];
   if (!token) return next();
-  
+
   const session = await Session.findOne({token}).populate('user');
   if (!session) {
     ctx.throw(401, 'Неверный аутентификационный токен');
   }
   session.lastVisit = new Date();
   await session.save();
-  
+
   ctx.user = session.user;
   return next();
 });
@@ -72,7 +72,8 @@ router.get('/categories', require('./controllers/categories'));
 router.get('/products', require('./controllers/products').list);
 router.get('/products/:id', require('./controllers/products').show);
 router.get('/recommendations', require('./controllers/recommendations'));
-router.post('/orders', mustBeAuthenticated, handleMongooseValidationError, require('./controllers/orders'));
+router.get('/orders', mustBeAuthenticated, require('./controllers/orders').list);
+router.post('/orders', mustBeAuthenticated, handleMongooseValidationError, require('./controllers/orders').checkout);
 
 // search
 router.get('/search', require('./controllers/search'));
