@@ -22,19 +22,30 @@ function socket(server) {
 
   io.on('connection', function (socket) {
     socket.on('message', async msg => {
-      const date = new Date();
-      
-      setTimeout(() => {
-        socket.emit('message', {
-          text: 'Добрый день, вас приветствует бот AnyShop.',
-        });
-      }, 700);
-      
-      await Message.create({
-        user: socket.user.id,
+      const message = new Message({
+        date: new Date(),
         text: msg,
-        date: date,
+        user: socket.user,
       });
+      
+      socket.emit('message', {
+        id: message.id,
+        author: socket.user.displayName,
+        time: `${message.date.getHours()}:${message.date.getMinutes()}`,
+        text: msg,
+      });
+      
+      setTimeout(async () => {
+        
+        const answer = await Message.create({
+          date: new Date(),
+          text: 'Вас приветствует бот AnyShop.',
+          user: ''
+        });
+        
+      }, 1000);
+      
+      await message.save();
     });
   });
   

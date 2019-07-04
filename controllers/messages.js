@@ -5,10 +5,10 @@ module.exports = async function messages(ctx, next) {
   
   ctx.body = {
     messages: messages.map(message => ({
-      date: message.date,
+      time: `${message.date.getHours()}:${message.date.getMinutes()}`,
       text: message.text,
       id: message.id,
-      user: message.user.displayName,
+      author: message.user.displayName,
     }))
   };
 };
