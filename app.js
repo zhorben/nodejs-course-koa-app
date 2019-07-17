@@ -8,6 +8,7 @@ const handleMongooseValidationError = require('./libs/validationErrors');
 const Session = require('./models/Session');
 const mustBeAuthenticated = require('./libs/mustBeAuthenticated');
 const orders = require('./controllers/orders');
+const registration = require('./controllers/registration');
 
 const app = new Koa();
 
@@ -65,8 +66,8 @@ router.use(async (ctx, next) => {
 router.post('/login', require('./controllers/login'));
 router.get('/oauth/:provider', require('./controllers/oauth').oauth);
 router.post('/oauth_callback', handleMongooseValidationError, require('./controllers/oauth').oauthCallback);
-router.post('/register', handleMongooseValidationError, require('./controllers/register'));
-router.post('/confirm', require('./controllers/confirm'));
+router.post('/register', handleMongooseValidationError, registration.register);
+router.post('/confirm', registration.confirm);
 
 // shop
 router.get('/categories', require('./controllers/categories'));
