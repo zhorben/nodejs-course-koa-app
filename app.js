@@ -7,6 +7,7 @@ const cors = require('@koa/cors');
 const handleMongooseValidationError = require('./libs/validationErrors');
 const Session = require('./models/Session');
 const mustBeAuthenticated = require('./libs/mustBeAuthenticated');
+const orders = require('./controllers/orders');
 
 const app = new Koa();
 
@@ -32,7 +33,7 @@ app.use(async (ctx, next) => {
 app.use((ctx, next) => {
   ctx.login = async function login(user) {
     const token = uuid();
-    await Session.create({ token, user, lastVisit: new Date() });
+    await Session.create({token, user, lastVisit: new Date()});
 
     return token;
   };
@@ -72,8 +73,8 @@ router.get('/categories', require('./controllers/categories'));
 router.get('/products', require('./controllers/products').list);
 router.get('/products/:id', require('./controllers/products').show);
 router.get('/recommendations', require('./controllers/recommendations'));
-router.get('/orders', mustBeAuthenticated, require('./controllers/orders').list);
-router.post('/orders', mustBeAuthenticated, handleMongooseValidationError, require('./controllers/orders').checkout);
+router.get('/orders', mustBeAuthenticated, handleMongooseValidationError, orders.list);
+router.post('/orders', mustBeAuthenticated, handleMongooseValidationError, orders.checkout);
 
 // search
 router.get('/search', require('./controllers/search'));
